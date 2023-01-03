@@ -41,6 +41,10 @@
             {"resourceType":"GMOverriddenProperty","resourceVersion":"1.0","name":"","propertyId":{"name":"text","path":"objects/objGuiButton/objGuiButton.yy",},"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"value":"Sign Out",},
             {"resourceType":"GMOverriddenProperty","resourceVersion":"1.0","name":"","propertyId":{"name":"tag","path":"objects/objGuiButton/objGuiButton.yy",},"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"value":"signout",},
           ],"isDnd":false,"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"inheritCode":false,"hasCreationCode":false,"colour":4294967295,"rotation":0.0,"scaleX":6.0,"scaleY":1.0,"imageIndex":0,"imageSpeed":1.0,"inheritedItemId":null,"frozen":false,"ignore":false,"inheritItemSettings":false,"x":64.0,"y":448.0,},
+        {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_37006EE3","properties":[
+            {"resourceType":"GMOverriddenProperty","resourceVersion":"1.0","name":"","propertyId":{"name":"text","path":"objects/objGuiButton/objGuiButton.yy",},"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"value":"UGC Menu",},
+            {"resourceType":"GMOverriddenProperty","resourceVersion":"1.0","name":"","propertyId":{"name":"tag","path":"objects/objGuiButton/objGuiButton.yy",},"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"value":"goto_ac",},
+          ],"isDnd":false,"objectId":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"inheritCode":false,"hasCreationCode":false,"colour":4294967295,"rotation":0.0,"scaleX":5.5,"scaleY":1.0,"imageIndex":0,"imageSpeed":1.0,"inheritedItemId":null,"frozen":false,"ignore":false,"inheritItemSettings":false,"x":896.0,"y":160.0,},
       ],"visible":true,"depth":0,"userdefinedDepth":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"gridX":32,"gridY":32,"layers":[],"hierarchyFrozen":false,"effectEnabled":true,"effectType":null,"properties":[],},
     {"resourceType":"GMRInstanceLayer","resourceVersion":"1.0","name":"Instances","instances":[
         {"resourceType":"GMRInstance","resourceVersion":"1.0","name":"inst_2F9B345F","properties":[],"isDnd":false,"objectId":{"name":"objTestcase","path":"objects/objTestcase/objTestcase.yy",},"inheritCode":false,"hasCreationCode":false,"colour":4294967295,"rotation":0.0,"scaleX":1.0,"scaleY":1.0,"imageIndex":0,"imageSpeed":1.0,"inheritedItemId":null,"frozen":false,"ignore":false,"inheritItemSettings":false,"x":96.0,"y":0.0,},
@@ -57,6 +61,7 @@
     {"name":"inst_320CFC0C","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},
     {"name":"inst_4B9175DE","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},
     {"name":"inst_43945044","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},
+    {"name":"inst_37006EE3","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},
     {"name":"inst_2F9B345F","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},
   ],
   "inheritCreationOrder": false,

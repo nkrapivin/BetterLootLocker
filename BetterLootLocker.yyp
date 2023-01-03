@@ -5,7 +5,12 @@
   "resources": [
     {"id":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"order":4,},
     {"id":{"name":"BetterLootLocker","path":"scripts/BetterLootLocker/BetterLootLocker.yy",},"order":0,},
+    {"id":{"name":"rmBLLTestcasePageMenu","path":"rooms/rmBLLTestcasePageMenu/rmBLLTestcasePageMenu.yy",},"order":9,},
+    {"id":{"name":"objTestcasePageHandler","path":"objects/objTestcasePageHandler/objTestcasePageHandler.yy",},"order":10,},
+    {"id":{"name":"rmBLLTestcaseACDesigner","path":"rooms/rmBLLTestcaseACDesigner/rmBLLTestcaseACDesigner.yy",},"order":7,},
     {"id":{"name":"objDefaultHttpHandler","path":"objects/objDefaultHttpHandler/objDefaultHttpHandler.yy",},"order":1,},
+    {"id":{"name":"rmBLLTestcaseUGC","path":"rooms/rmBLLTestcaseUGC/rmBLLTestcaseUGC.yy",},"order":6,},
+    {"id":{"name":"objAcdTestcase","path":"objects/objAcdTestcase/objAcdTestcase.yy",},"order":8,},
     {"id":{"name":"objTestcase","path":"objects/objTestcase/objTestcase.yy",},"order":3,},
     {"id":{"name":"sprGuiButton","path":"sprites/sprGuiButton/sprGuiButton.yy",},"order":5,},
     {"id":{"name":"rmBLLTestcase","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},"order":2,},
@@ -29,6 +34,9 @@
   },
   "RoomOrderNodes": [
     {"roomId":{"name":"rmBLLTestcase","path":"rooms/rmBLLTestcase/rmBLLTestcase.yy",},},
+    {"roomId":{"name":"rmBLLTestcaseUGC","path":"rooms/rmBLLTestcaseUGC/rmBLLTestcaseUGC.yy",},},
+    {"roomId":{"name":"rmBLLTestcaseACDesigner","path":"rooms/rmBLLTestcaseACDesigner/rmBLLTestcaseACDesigner.yy",},},
+    {"roomId":{"name":"rmBLLTestcasePageMenu","path":"rooms/rmBLLTestcasePageMenu/rmBLLTestcasePageMenu.yy",},},
   ],
   "Folders": [
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Animation Curves","folderPath":"folders/Animation Curves.yy","order":12,},

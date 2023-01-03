@@ -11,6 +11,7 @@ var hresult_ = async_load[? "result"];
 
 if (hstatus_ == 1) {
 	// ignore requests that are in progress, we only want finished ones.
+	show_debug_message("An HTTP request is in progress");
 	exit;
 }
 

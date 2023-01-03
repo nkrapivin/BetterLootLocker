@@ -21,5 +21,12 @@ if (targindex_ == -1) {
 // get rid of it
 array_delete(dialogIds, targindex_, 1);
 
+var myresult_ = async_load[? "result"] ?? "";
+
 // work with pair_
-pair_.callbackFunction(async_load[? "result"]);
+if (!is_undefined(pair_.selfCtx)) {
+	with (pair_.selfCtx) pair_.callbackFunction(myresult_);
+}
+else {
+	pair_.callbackFunction(myresult_);
+}

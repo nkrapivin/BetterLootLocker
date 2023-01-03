@@ -1,5 +1,9 @@
 /// @description make an http thingy
 
+if (instance_number(object_index) > 1) {
+	instance_destroy();
+	exit;
+}
 
 makeRandomSessionId = function() {
 	var alphabet = "0123456789abcdef";
@@ -24,19 +28,26 @@ bll = new BetterLootLocker(http.httpHandlerFunction);
 bll.setGameKey("dev_c5f06511aac54769ab35cb2fcedbb149");
 bll.setIsDevelopment(true);
 bll.setDomainKey("xebmpt49");
-// ^^ change these parameters ^^ //
 bll.setSessionId(sessionId);
 bll.setGameVersion(GM_version); // good enough for test purposes
+// ^^ change these parameters ^^ //
 
 dialogIds = [];
-askForString = function(titleString, defaultString, onFunction) {
-	var dialogId_ = get_string_async(titleString, defaultString);
+askForString = function(titleString, defaultString, onFunction, selfOpt = undefined) {
+	var dialogId_;
+	if (is_undefined(titleString) || titleString == "") {
+		dialogId_ = show_message_async(defaultString);
+	}
+	else {
+		dialogId_ = get_string_async(titleString, defaultString);
+	}
+	
 	if (dialogId_ < 0) {
 		onFunction("");
 		exit;
 	}
 	
-	array_push(dialogIds, { requestId: dialogId_, callbackFunction: onFunction });
+	array_push(dialogIds, { requestId: dialogId_, callbackFunction: onFunction, selfCtx: selfOpt });
 };
 
 findButton = function(tagString) {
@@ -70,7 +81,12 @@ writeToken = function() {
 };
 
 updateBtns = function() {
-	findButton("signin").text = signedIn ? ("Signed in: " + playerName) : "Sign in";	
+	if (room == rmBLLTestcase) {
+		findButton("signin").text = signedIn ? ("Signed in: " + playerName) : "Sign in";
+	}
+	else if (room == rmBLLTestcaseUGC) {
+		
+	}
 };
 
 askForNameIfNone = function(overrideBoolOpt = false) {
@@ -134,164 +150,7 @@ attemptSilentSignin = function() {
 	}	
 };
 
-// prepare GUI controls
-attachToButton("signin", function(btn) {
-	if (signedIn) {
-		exit;
-	}
-	
-	askForString("email?", "test@example.com", function(email_) {
-		if (email_ == "") {
-			exit;
-		}
-		
-		playerEmail = email_;
-		askForString("password?", "12345", method({that: other}, function(password_) {
-			if (password_ == "") {
-				exit;
-			}
-			
-			that.bll
-			.whitelabelSignIn(that.playerEmail, password_, true)
-			.andThen(function(e) {
-				that.playerEmail = e.resultAsJson.email;
-				that.bll
-				.loginAsWhitelabel(that.playerEmail, e.resultAsJson.session_token)
-				.andThen(function(e) {
-					that.sessToken = e.resultAsJson.session_token;
-					that.bll
-					.playerGetName()
-					.andThen(function(e) {
-						that.playerName = e.resultAsJson.name;
-						signedIn = true;
-						onLoginOkay();
-					})
-					.andCatch(function(e) {
-						show_message_async("Sign in stage 3 failed:\n" + e.result);
-					})
-					.andFinally(function(e) {
-						show_debug_message(e);
-					});
-				})
-				.andCatch(function(e) {
-					show_message_async("Sign in stage 2 failed:\n" + e.result);
-				})
-				.andFinally(function(e) {
-					show_debug_message(e);
-				});
-			})
-			.andCatch(function(e) {
-				show_message_async("Sign in failed:\n" + e.result);
-			})
-			.andFinally(function(e) {
-				show_debug_message(e);
-			});
-		}));
-	});
-});
 
-attachToButton("signin_guest", function(btn) {
-	if (signedIn) {
-		exit;
-	}
-	
-	askForString("player id?", "someplayerid1337", function(pid_) {
-		if (pid_ == "") {
-			exit;	
-		}
-		
-		bll
-		.loginAsGuest(pid_)
-		.andThen(function(e) {
-			sessToken = e.resultAsJson.session_token;
-			bll
-			.setSessionToken(sessToken)
-			.playerGetName()
-			.andThen(function(e) {
-				playerName = e.resultAsJson.name;
-				signedIn = true;
-				show_message_async("Guest Sign in okay, but please use whitelabel instead.");
-				onLoginOkay();
-			})
-			.andCatch(function(e) {
-				show_message_async("Guest Sign in stage 2 failed:\n" + e.result);
-			})
-			.andFinally(function(e) {
-				show_debug_message(e);
-			});
-		})
-		.andCatch(function(e) {
-			show_message_async("Guest Sign in failed:\n" + e.result);
-		})
-		.andFinally(function(e) {
-			show_debug_message(e);
-		});
-	});
-});
-
-attachToButton("register", function(btn) {
-	askForString("email?", "test@example.com", function(email_) {
-		if (email_ == "") {
-			exit;
-		}
-		
-		askForString("password?", "12345", method({email: email_, that: other}, function(password_) {
-			if (password_ == "") {
-				exit;
-			}
-			
-			that.bll
-			.whitelabelSignUp(email, password_)
-			.andThen(function(e) {
-				show_message_async("Please verify your email first, only then sign in.\nemail: " + e.resultAsJson.email);
-			})
-			.andCatch(function(e) {
-				show_message_async("There was an error when signing up:\n" + e.result);
-			})
-			.andFinally(function(e) {
-				show_debug_message(e);
-			});
-		}));
-	});
-});
-
-attachToButton("playernameset", function(btn) {
-	if (!signedIn) {
-		exit;
-	}
-	
-	askForNameIfNone(true);
-});
-
-attachToButton("signout", function(btn) {
-	if (!signedIn) {
-		exit;
-	}
-	
-	playerName = "";
-	playerEmail = "";
-	sessToken = "";
-	signedIn = false;
-	
-	bll
-	.endSession(true)
-	.andThen(function(e) {
-		show_message_async("Signed out and erased cache, please sign in again");	
-	})
-	.andCatch(function(e) {
-		show_message_async("Failed to end your session:\n" + e.result);	
-	})
-	.andFinally(function(e) {
-		show_debug_message(e);
-	})
-	.andBack()
-	.setSessionToken(undefined);
-	
-	sessionId = makeRandomSessionId();
-	
-	file_delete("llcache.dat");
-	updateBtns();
-});
 
 // attempt to sign in silently
 attemptSilentSignin();

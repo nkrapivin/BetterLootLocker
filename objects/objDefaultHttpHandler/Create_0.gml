@@ -1,5 +1,10 @@
 /// @description Initialize methods.
 
+if (instance_number(object_index) > 1) {
+	instance_destroy();
+	exit;
+}
+
 requests = [];
 httpHandlerFunction = function(httpRequestId, promiseStruct) {
 	array_push(requests, { requestId: httpRequestId, resolver: promiseStruct });

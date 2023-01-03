@@ -37,9 +37,15 @@ function BetterLootLockerPromise(ownerOfThisPromiseStruct) constructor {
 			};
 		}
 		
-		for (var i_ = 0; i_ < funcslen_; ++i_) {
-			var func_ = handlersArray_[@ i_];
-			func_(argumentStruct);
+		try {
+			for (var i_ = 0; i_ < funcslen_; ++i_) {
+				var func_ = handlersArray_[@ i_];
+				func_(argumentStruct);
+			}
+		} catch (exc_) {
+			var orig_ = argumentStruct;
+			argumentStruct = exc_;
+			argumentStruct.data = orig_;
 		}
 		
 		array_resize(handlersArray_, 0);
@@ -195,6 +201,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
 				"player_identifier", playerIdentifierString,
+				"development_mode", isDevelopment_
 			)
 		);
 	};
@@ -209,7 +216,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
 				"player_identifier", string(steamIdInt64),
-				"platform", "steam"
+				"platform", "steam",
+				"development_mode", isDevelopment_
 			)
 		);
 	};
@@ -223,7 +231,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_key", gameKey_,
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
-				"nsa_id_token", nsaJwtBase64IdTokenString
+				"nsa_id_token", nsaJwtBase64IdTokenString,
+				"development_mode", isDevelopment_
 			)
 		);
 	};
@@ -238,7 +247,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
 				"player_identifier", psnOnlineIdString,
-				"platform", "psn"
+				"platform", "psn",
+				"development_mode", isDevelopment_
 			)
 		);
 	};
@@ -253,7 +263,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
 				"player_identifier", deviceIdString,
-				"platform", "android"
+				"platform", "android",
+				"development_mode", isDevelopment_
 			)
 		);
 	};
@@ -268,7 +279,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 				"game_version", gameVersion_,
 				"session_id", sessionId_,
 				"email", emailString,
-				"token", whitelabelTokenString
+				"token", whitelabelTokenString,
+				"development_mode", isDevelopment_
 			)
 		);	
 	};
@@ -281,7 +293,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			makeJsonBody_(
 				"email", emailString,
 				"password", passwordString,
-				"remember", doRememberBool
+				"remember", bool(doRememberBool)
 			)
 		);
 	};
@@ -511,7 +523,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			"PUT",
 			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "application/json"),
 			makeJsonBody_(
-				"completed", (isCompletedBool? "true": "false"),
+				"completed", bool(isCompletedBool),
 				"data", makeJsonInner_(
 					"name", nameStringOpt,
 					"context_id", contextIdRealOpt,
@@ -568,6 +580,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		buffer_write(buff_, buffer_text, "--------------------------ee354ed66ff52e4f\r\n");
 		buffer_write(buff_, buffer_text, "Content-Disposition: form-data; name=\"file\"; filename=\"" + fileNameString + "\"\r\n");
 		buffer_write(buff_, buffer_text, "Content-Type: application/octet-stream\r\n");
+		buffer_write(buff_, buffer_text, "\r\n");
 		buffer_resize(buff_, buffer_tell(buff_) + fileSizeRealOpt);
 		buffer_copy(fileBufferId, fileOffsetRealOpt, fileSizeRealOpt, buff_, buffer_tell(buff_));
 		buffer_seek(buff_, buffer_seek_relative, fileSizeRealOpt);
@@ -583,6 +596,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		buffer_resize(buff_, buffer_tell(buff_));
 		return httpPostJson_(
 			"https://api.lootlocker.io/game/v1/player/assets/candidates/" + string(idReal) + "/file",
+			//"https://enmtkpe6b2t9q.x.pipedream.net/game/v1/player/assets/candidates/" + string(idReal) + "/file",
 			"POST",
 			// yes I know that I should make a random form-data boundary, no, I don't care at all.
 			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "multipart/form-data; boundary=------------------------ee354ed66ff52e4f"),
@@ -599,6 +613,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		buffer_write(buff_, buffer_text, "--------------------------a620a16d76d561f3\r\n");
 		buffer_write(buff_, buffer_text, "Content-Disposition: form-data; name=\"file\"; filename=\"" + fileNameString + "\"\r\n");
 		buffer_write(buff_, buffer_text, "Content-Type: application/octet-stream\r\n");
+		buffer_write(buff_, buffer_text, "\r\n");
 		// ---- append the contents of fileBufferId to buff_
 		buffer_resize(buff_, buffer_tell(buff_) + fileSizeRealOpt);
 		buffer_copy(fileBufferId, fileOffsetRealOpt, fileSizeRealOpt, buff_, buffer_tell(buff_));
@@ -626,7 +641,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			"POST",
 			// yes I know that I should make a random form-data boundary, no, I don't care at all.
 			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "multipart/form-data; boundary=------------------------a620a16d76d561f3"),
-			buff_
+			buff_ // this should send the raw bytes in the POST body, not a UTF-8 string
 		);	
 	};
 	
@@ -755,6 +770,81 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		return httpPostJson_(
 			"https://api.lootlocker.io/game/ping",
 			"GET",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	arrayToAssetString_ = function(filtersArray) {
+		var s_ = "";
+		for (var i_ = 0, l_ = array_length(filtersArray); i_ < l_; ++i_) {
+			s_ += filtersArray[@ i_].key;
+			s_ += "=";
+			s_ += filtersArray[@ i_].value;
+			if (i_ < l_ - 1) {
+				s_ += ";";
+			}
+		}
+		return s_;
+	};
+	
+	contextsGetAll = function() {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/contexts",
+			"GET",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	assetsGetAll = function(sinceDateStringOpt = undefined) {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/assets"
+			+ (is_undefined(sinceDateStringOpt)? "": ("?since=" + sinceDateStringOpt)),
+			"GET",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	assetsGetList = function(countReal, afterRealOpt = undefined, contextIdRealOpt = undefined, filterStringOpt = undefined, includeUgcBoolOpt = undefined, assetFiltersArrayOpt = undefined, ugcCreatorPlayerIdOpt = undefined) {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/assets/list"
+			+ "?count=" + string(countReal)
+			+ (is_undefined(afterRealOpt)? "": ("&after=" + string(afterRealOpt)))
+			+ (is_undefined(contextIdRealOpt)? "": ("&context_id=" + string(contextIdRealOpt)))
+			+ (is_undefined(filterStringOpt)? "": ("&filter=" + filterStringOpt))
+			+ (is_undefined(assetFiltersArrayOpt)? "": ("&asset_filters=" + arrayToAssetString_(assetFiltersArrayOpt)))
+			+ (is_undefined(includeUgcBoolOpt)? "": ("&include_ugc=" + (includeUgcBoolOpt? "true": "false")))
+			+ (is_undefined(ugcCreatorPlayerIdOpt)? "": ("&ugc_creator_player_id=" + string(ugcCreatorPlayerIdOpt))),
+			"GET",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	assetsGetFavourites = function() {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/asset/favourites",
+			"GET",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	assetsAddFavourite = function(assetId) {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/asset/" + string(assetId) + "/favourite",
+			"POST",
+			makeDsmap_("x-session-token", sessionToken_),
+			""
+		);
+	};
+	
+	assetsRemoveFavourite = function(assetId) {
+		return httpPostJson_(
+			"https://api.lootlocker.io/game/v1/asset/" + string(assetId) + "/favourite",
+			"DELETE",
 			makeDsmap_("x-session-token", sessionToken_),
 			""
 		);
