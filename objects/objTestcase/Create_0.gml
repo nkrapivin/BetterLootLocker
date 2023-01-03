@@ -145,13 +145,14 @@ attachToButton("signin", function(btn) {
 			exit;
 		}
 		
-		askForString("password?", "12345", method({email: email_, that: other}, function(password_) {
+		playerEmail = email_;
+		askForString("password?", "12345", method({that: other}, function(password_) {
 			if (password_ == "") {
 				exit;
 			}
 			
 			that.bll
-			.whitelabelSignIn(email, password_, true)
+			.whitelabelSignIn(that.playerEmail, password_, true)
 			.andThen(function(e) {
 				that.playerEmail = e.resultAsJson.email;
 				that.bll
