@@ -8,6 +8,12 @@ var hhstatus_ = async_load[? "http_status"];
 var hfilename_ = async_load[? "filename"];
 var hurl_ = async_load[? "url"];
 var hresult_ = async_load[? "result"];
+var hresponseheaders_ = async_load[? "response_headers"];
+
+// hackfix for GameMaker not understanding HTTP 204 No Content replies
+if (hhstatus_ == 204) {
+	hstatus_ = 0;
+}
 
 if (hstatus_ == 1) {
 	// ignore requests that are in progress, we only want finished ones.
@@ -36,12 +42,18 @@ if (targindex_ == -1) {
 array_delete(requests, targindex_, 1);
 
 var hresultjson_ = parseJsonSafe(hresult_);
+var hheadersstruct_ = undefined;
+if (!is_undefined(hresponseheaders_) && hresponseheaders_ >= 0) {
+	hheadersstruct_ = parseJsonSafe(json_encode(hresponseheaders_));
+}
+
 var hstruct_ = {
 	status: hstatus_,
 	httpStatus: hhstatus_,
 	url: hurl_,
 	filename: hfilename_,
 	result: hresult_,
+	headers: hheadersstruct_,
 	resultAsJson: hresultjson_
 };
 

@@ -599,7 +599,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			//"https://enmtkpe6b2t9q.x.pipedream.net/game/v1/player/assets/candidates/" + string(idReal) + "/file",
 			"POST",
 			// yes I know that I should make a random form-data boundary, no, I don't care at all.
-			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "multipart/form-data; boundary=------------------------ee354ed66ff52e4f"),
+			makeDsmap_("x-session-token", sessionToken_, "Expect", "100-continue", "Content-Type", "multipart/form-data; boundary=------------------------ee354ed66ff52e4f"),
 			buff_
 		);
 	};
@@ -640,7 +640,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			"https://api.lootlocker.io/game/player/files",
 			"POST",
 			// yes I know that I should make a random form-data boundary, no, I don't care at all.
-			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "multipart/form-data; boundary=------------------------a620a16d76d561f3"),
+			makeDsmap_("x-session-token", sessionToken_, "Expect", "100-continue", "Content-Type", "multipart/form-data; boundary=------------------------a620a16d76d561f3"),
 			buff_ // this should send the raw bytes in the POST body, not a UTF-8 string
 		);	
 	};
@@ -848,6 +848,20 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			makeDsmap_("x-session-token", sessionToken_),
 			""
 		);
+	};
+	
+	getFile = function(cdnUrlString, whereLocationString) {
+		var httpId_ = http_get_file(cdnUrlString, whereLocationString);
+		var promise_ = undefined;
+		if (httpId_ < 0) {
+			// wtf? http allocation failed? signal a very bad condition
+			throw "http_get_file() failed";
+		}
+		else {
+			// register a promise
+			promise_ = new BetterLootLockerPromise(self);
+			return httpHandlerFunction_(httpId_, promise_);
+		}
 	};
 }
 

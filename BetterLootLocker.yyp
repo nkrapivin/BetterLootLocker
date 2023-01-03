@@ -4,6 +4,7 @@
   "name": "BetterLootLocker",
   "resources": [
     {"id":{"name":"objGuiButton","path":"objects/objGuiButton/objGuiButton.yy",},"order":4,},
+    {"id":{"name":"rmBLLTestcasePS","path":"rooms/rmBLLTestcasePS/rmBLLTestcasePS.yy",},"order":11,},
     {"id":{"name":"BetterLootLocker","path":"scripts/BetterLootLocker/BetterLootLocker.yy",},"order":0,},
     {"id":{"name":"rmBLLTestcasePageMenu","path":"rooms/rmBLLTestcasePageMenu/rmBLLTestcasePageMenu.yy",},"order":9,},
     {"id":{"name":"objTestcasePageHandler","path":"objects/objTestcasePageHandler/objTestcasePageHandler.yy",},"order":10,},
@@ -37,6 +38,7 @@
     {"roomId":{"name":"rmBLLTestcaseUGC","path":"rooms/rmBLLTestcaseUGC/rmBLLTestcaseUGC.yy",},},
     {"roomId":{"name":"rmBLLTestcaseACDesigner","path":"rooms/rmBLLTestcaseACDesigner/rmBLLTestcaseACDesigner.yy",},},
     {"roomId":{"name":"rmBLLTestcasePageMenu","path":"rooms/rmBLLTestcasePageMenu/rmBLLTestcasePageMenu.yy",},},
+    {"roomId":{"name":"rmBLLTestcasePS","path":"rooms/rmBLLTestcasePS/rmBLLTestcasePS.yy",},},
   ],
   "Folders": [
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Animation Curves","folderPath":"folders/Animation Curves.yy","order":12,},
