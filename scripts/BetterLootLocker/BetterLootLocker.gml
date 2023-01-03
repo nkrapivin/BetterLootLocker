@@ -286,7 +286,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		);
 	};
 	
-	whitelabelVerifySession = function(tokenString, emailString) {
+	whitelabelVerifySession = function(emailString, tokenString) {
 		return httpPostJson_(
 			"https://api.lootlocker.io/white-label-login/verify-session",
 			"POST",
