@@ -54,15 +54,11 @@ var hstruct_ = {
 	filename: hfilename_,
 	result: hresult_,
 	headers: hheadersstruct_,
-	resultAsJson: hresultjson_
+	resultAsJson: hresultjson_,
+	isException: false
 };
 
 // now we can work with pair_
-if (hstatus_ < 0 || hhstatus_ < 200 || hhstatus_ > 299) {
-	pair_.resolver.resolvePromise_(true, hstruct_);
-}
-else {
-	pair_.resolver.resolvePromise_(false, hstruct_);
-}
+pair_.resolver.resolvePromise_((hstatus_ < 0 || hhstatus_ < 200 || hhstatus_ > 299), hstruct_);
 
 

@@ -91,7 +91,7 @@
     "PhysicsWorldPixToMetres": 0.1,
   },
   "parent": {
-    "name": "BetterLootLocker",
-    "path": "folders/BetterLootLocker.yy",
+    "name": "BetterLootLocker Testcase",
+    "path": "folders/BetterLootLocker Testcase.yy",
   },
 }

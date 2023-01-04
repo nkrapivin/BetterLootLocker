@@ -92,7 +92,7 @@
     "resourceType": "GMNineSliceData",
   },
   "parent": {
-    "name": "BetterLootLocker",
-    "path": "folders/BetterLootLocker.yy",
+    "name": "BetterLootLocker Testcase",
+    "path": "folders/BetterLootLocker Testcase.yy",
   },
 }

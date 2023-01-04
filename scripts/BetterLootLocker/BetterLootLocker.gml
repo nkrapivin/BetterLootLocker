@@ -3,28 +3,19 @@ function BetterLootLockerPromise(ownerOfThisPromiseStruct) constructor {
 	rejectHandlers_ = [];
 	finallyHandlers_ = [];
 	promiseOwner_ = ownerOfThisPromiseStruct;
-	isPromiseResolved_ = false;
-	wasPromiseRejected_ = false;
-	promiseResolveData_ = undefined;
 	
 	resolvePromise_ = function(isRejectionBool, argumentStruct) {
-		var handlersArray_;
-		if (isRejectionBool) {
-			handlersArray_ = rejectHandlers_;
-		}
-		else {
-			handlersArray_ = fulfillHandlers_;
-		}
+		var thens_ = fulfillHandlers_;
+		var thenslen_ = array_length(thens_);
 		
-		isPromiseResolved_ = true;
-		wasPromiseRejected_ = isRejectionBool;
-		promiseResolveData_ = argumentStruct;
 		var finallies_ = finallyHandlers_;
 		var finallylen_ = array_length(finallies_);
-		var funcslen_ = array_length(handlersArray_);
+		
+		var catches_ = rejectHandlers_;
+		var catchlen_ = array_length(catches_);
 		
 		// comment this out if you don't want...
-		if (isRejectionBool && funcslen_ <= 0 && finallylen_ <= 0) {
+		if (isRejectionBool && catchlen_ <= 0 && finallylen_ <= 0) {
 			throw {
 				data: argumentStruct,
 				message: "A promise has been rejected with no onRejected or onFinally handlers!",
@@ -37,18 +28,42 @@ function BetterLootLockerPromise(ownerOfThisPromiseStruct) constructor {
 			};
 		}
 		
+		// perform andThen
+		
 		try {
-			for (var i_ = 0; i_ < funcslen_; ++i_) {
-				var func_ = handlersArray_[@ i_];
-				func_(argumentStruct);
+			if (!isRejectionBool) {
+				for (var i_ = 0; i_ < thenslen_; ++i_) {
+					var func_ = thens_[@ i_];
+					func_(argumentStruct);
+				}
 			}
 		} catch (exc_) {
 			var orig_ = argumentStruct;
 			argumentStruct = exc_;
+			argumentStruct.isException = true;
 			argumentStruct.data = orig_;
+			isRejectionBool = true;
 		}
 		
-		array_resize(handlersArray_, 0);
+		array_resize(thens_, 0);
+		
+		// perform andCatch
+		
+		try {
+			if (isRejectionBool) {
+				for (var i_ = 0; i_ < catchlen_; ++i_) {
+					var func_ = catches_[@ i_];
+					func_(argumentStruct);
+				}
+			}
+		} catch (exc_) {
+			// idk what to do when andCatch throws honestly O_O
+			// maybe let's call andFinally...
+		}
+		
+		array_resize(catches_, 0);
+		
+		// perform andFinally
 		
 		for (var i_ = 0; i_ < finallylen_; ++i_) {
 			var func_ = finallies_[@ i_];
@@ -71,10 +86,6 @@ function BetterLootLockerPromise(ownerOfThisPromiseStruct) constructor {
 		
 		if (!is_undefined(onFinally)) {
 			array_push(finallyHandlers_, onFinally);
-		}
-		
-		if (isPromiseResolved_) {
-			return resolvePromise_(wasPromiseRejected_, promiseResolveData_);
 		}
 		
 		return self;
