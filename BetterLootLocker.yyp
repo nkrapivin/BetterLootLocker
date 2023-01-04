@@ -43,8 +43,8 @@
     {"roomId":{"name":"rmBLLTestcaseLeaderboard","path":"rooms/rmBLLTestcaseLeaderboard/rmBLLTestcaseLeaderboard.yy",},},
   ],
   "Folders": [
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"BetterLootLocker","folderPath":"folders/BetterLootLocker.yy","order":0,},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"BetterLootLocker Testcase","folderPath":"folders/BetterLootLocker Testcase.yy","order":1,},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"BetterLootLocker","folderPath":"folders/BetterLootLocker.yy","order":0,},
   ],
   "AudioGroups": [
     {"resourceType":"GMAudioGroup","resourceVersion":"1.3","name":"audiogroup_default","targets":-1,},

@@ -112,6 +112,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 	sessionToken_ = undefined;
 	domainKey_ = undefined;
 	isDevelopment_ = undefined;
+	llVersion_ = "2021-03-01"; // LL-Version: http header
 	
 	makeDsmap_ = function() {
 		var argc_ = argument_count, map_ = ds_map_create();
@@ -154,6 +155,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 	};
 	
 	httpPostJson_ = function(httpUrlString, httpMethodString, headersMap, bodyStringOrBufferId) {
+		ds_map_add(headersMap, "LL-Version", llVersion_); // append to *all* outcoming requests
 		var httpId_ = http_request(httpUrlString, httpMethodString, headersMap, bodyStringOrBufferId);
 		ds_map_destroy(headersMap);
 		if (!is_string(bodyStringOrBufferId)) {
