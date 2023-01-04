@@ -31,7 +31,7 @@ attachToButton("page_forward", function(btn) {
 	}
 	
 	++pageIndex;
-	onPageScroll();
+	onPageScroll(1);
 });
 
 attachToButton("page_backward", function(btn) {
@@ -40,7 +40,7 @@ attachToButton("page_backward", function(btn) {
 	}
 	
 	--pageIndex;
-	onPageScroll();
+	onPageScroll(-1);
 });
 
 attachToButton("goto_back", function(btn) {

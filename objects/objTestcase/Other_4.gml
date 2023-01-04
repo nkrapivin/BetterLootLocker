@@ -324,10 +324,20 @@ else if (room == rmBLLTestcaseUGC) {
 			bll = global.pageBLL;
 			backRoom = rmBLLTestcaseUGC;
 			statusText = "";
+			lastIds = [ undefined ]; // first page is always undefined.
+			asItems = undefined;
 			
-			onPageScroll = function() {
+			onPageScroll = function(dir_) {
 				if (pageIndex < 0) {
 					pageIndex = 0;
+					exit;
+				}
+				
+				// if this is not the first page and we ran out of items
+				// do not allow to scroll backward
+				// (first page is always okay though)
+				if (pageIndex > 0 && dir_ > 0 && array_length(asItems) == 0) {
+					pageIndex += -dir_; // cancel out the movement
 					exit;
 				}
 				
@@ -335,9 +345,10 @@ else if (room == rmBLLTestcaseUGC) {
 				statusText = "Fetching...";
 				
 				bll
-				.assetsGetList(pageElements)
+				.assetsGetList(pageElements, lastIds[@ pageIndex], undefined, undefined, true)
 				.andThen(function(e) {
 					var items = e.resultAsJson.assets;
+					asItems = items;
 					
 					with (objGuiButton) {
 						if (tag == "CustomMadeBtn") {
@@ -347,12 +358,15 @@ else if (room == rmBLLTestcaseUGC) {
 					
 					var myX = 192 + 64;
 					var myY = 64;
-					for (var i_ = 0, l_ = array_length(items); i_ < l_; ++i_) {
-						var it = items[@ i_];
+					var maxId_ = 0; // this will hold the largest asset id for this page
+					var l_ = array_length(items);
+					for (var i_ = 0; i_ < l_; ++i_) {
+						var it_ = items[@ i_];
+						maxId_ = max(maxId_, it_.id);
 						
 						with (instance_create_layer(myX, myY, "Gui", objGuiButton)) {
 							bll = other.bll;
-							tag2 = it;
+							tag2 = it_;
 							owner = other;
 							tag = "CustomMadeBtn";
 							text = ".";
@@ -387,10 +401,19 @@ else if (room == rmBLLTestcaseUGC) {
 						myY += 64 + 32;
 					}
 					
+					if (maxId_ == 0) {
+						maxId_ = undefined;
+					}
+					
+					lastIds[@ pageIndex + 1] = maxId_;
+					
+					show_debug_message("pageIndex=" + string(pageIndex) + ",maxId=" + string(maxId_) + ",lastids=" + string(lastIds));
+					
 					statusText = "Fetched!";
 				})
 				.andCatch(function(e) {
-					statusText = "There was an error";	
+					statusText = "There was an error";
+					show_debug_message(e);
 				})
 				.andFinally(function(e) {
 					stopScrolling = false;
@@ -405,7 +428,7 @@ else if (room == rmBLLTestcaseUGC) {
 				draw_text(x, y, s_);
 			};
 			
-			onPageScroll();
+			onPageScroll(1);
 		}};
 		room_goto(rmBLLTestcasePageMenu);
 	});
