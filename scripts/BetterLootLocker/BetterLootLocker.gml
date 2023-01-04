@@ -380,7 +380,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 		);
 	};
 	
-	leaderboardSubmitScore = function(leaderboardIdString, scoreReal, metadataStringOpt = undefined) {
+	leaderboardSubmitScore = function(leaderboardIdString, scoreReal, metadataStringOpt = undefined, memberIdStringOpt = undefined) {
 		return httpPostJson_(
 			"https://api.lootlocker.io/game/leaderboards/"
 				+ leaderboardIdString
@@ -389,7 +389,8 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			makeDsmap_("x-session-token", sessionToken_, "Content-Type", "application/json"),
 			makeJsonBody_(
 				"score", scoreReal,
-				"metadata", metadataStringOpt
+				"metadata", string(metadataStringOpt),
+				"member_id", string(memberIdStringOpt)
 			)
 		);
 	};
@@ -410,7 +411,7 @@ function BetterLootLocker(httpHandlerFunction) constructor {
 			"https://api.lootlocker.io/game/leaderboards/member/"
 				+ string(memberIdString)
 				+ "?count=" + string(countReal)
-				+ (is_undefined(afterRealOpt) ? "" : ("&after=" + string(afterRealOpt))),
+				+ (is_undefined(afterRealOpt)? "": ("&after=" + string(afterRealOpt))),
 			"GET",
 			makeDsmap_("x-session-token", sessionToken_),
 			""

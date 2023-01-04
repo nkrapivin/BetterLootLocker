@@ -178,9 +178,41 @@ if (room == rmBLLTestcase) {
 		room_goto(rmBLLTestcasePS);
 	});
 	
+	attachToButton("goto_leaderboards", function(btn) {
+		if (!signedIn) {
+			exit;
+		}
+		
+		askForString("which leaderboard id?", "daily", function(name_) {
+			if (name_ == "") {
+				exit;
+			}
+			
+			leaderboardId = name_;
+			room_goto(rmBLLTestcaseLeaderboard);
+		});
+	});
+	
 	updateBtns();
 }
 else if (room == rmBLLTestcaseUGC) {
+	/*
+	bll
+	.assetCandidateUpdate(40067, true, undefined, 140341)
+	.andThen(function(e) {
+		show_debug_message(e.result);
+		show_message_async("lol");
+	})
+	.andCatch(function(e) {})
+	.andBack()
+	.assetCandidateUpdate(40115, true)
+	.andThen(function(e) {
+		show_debug_message(e.result);
+		show_message_async("lol 2");
+	})
+	.andCatch(function(e) {});
+	*/
+	
 	attachToButton("goto_back", function(btn) {
 		room_goto(rmBLLTestcase);
 	});
@@ -204,8 +236,6 @@ else if (room == rmBLLTestcaseUGC) {
 				
 				stopScrolling = true;
 				statusText = "Fetching...";
-				
-				
 				
 				bll
 				.assetCandidateListing()
@@ -250,7 +280,9 @@ else if (room == rmBLLTestcaseUGC) {
 								draw_set_valign(fa_top);
 								draw_set_color(c_white);
 								
-								s_ += tag2.data.name + " (STATUS = " + tag2.status + ")\n";
+								s_ += tag2.data.name + " (STATUS = " + tag2.status + ")" + "\n";
+								s_ += "asset id=" + string(tag2.asset_id) + ", player id=" + string(tag2.player_id);
+								s_ += ", id=" + string(tag2.id);
 								
 								draw_text(x + sprite_width + sprite_width/4, y, s_);
 							};
@@ -275,6 +307,98 @@ else if (room == rmBLLTestcaseUGC) {
 			
 			onDrawSummary = function() {
 				var s_ = "Asset Candidates:\n";
+				s_ += "Page " + string(1 + pageIndex) + "\n";
+				s_ += statusText + "\n";
+				
+				draw_text(x, y, s_);
+			};
+			
+			onPageScroll();
+		}};
+		room_goto(rmBLLTestcasePageMenu);
+	});
+	
+	attachToButton("goto_asset_browse", function(btn) {
+		global.pageBLL = bll;
+		global.pageInitScript = function(pageMenuHandler) { with (pageMenuHandler) {
+			bll = global.pageBLL;
+			backRoom = rmBLLTestcaseUGC;
+			statusText = "";
+			
+			onPageScroll = function() {
+				if (pageIndex < 0) {
+					pageIndex = 0;
+					exit;
+				}
+				
+				stopScrolling = true;
+				statusText = "Fetching...";
+				
+				bll
+				.assetsGetList(pageElements)
+				.andThen(function(e) {
+					var items = e.resultAsJson.assets;
+					
+					with (objGuiButton) {
+						if (tag == "CustomMadeBtn") {
+							instance_destroy();
+						}
+					}
+					
+					var myX = 192 + 64;
+					var myY = 64;
+					for (var i_ = 0, l_ = array_length(items); i_ < l_; ++i_) {
+						var it = items[@ i_];
+						
+						with (instance_create_layer(myX, myY, "Gui", objGuiButton)) {
+							bll = other.bll;
+							tag2 = it;
+							owner = other;
+							tag = "CustomMadeBtn";
+							text = ".";
+							
+							onButtonClick = function(btn) {
+								/*
+								bll
+								.assetCandidateDelete(tag2.id)
+								.andThen(function(e) {
+									owner.onPageScroll();
+								});
+								*/
+							};
+							
+							onUpdate = function(btn) {
+								var s_ = "";
+								
+								draw_set_halign(fa_left);
+								draw_set_valign(fa_top);
+								draw_set_color(c_white);
+								
+								s_ += tag2.name + " (context id = " + string(tag2.context_id) + ")\n";
+								
+								draw_text(x + sprite_width + sprite_width/4, y, s_);
+							};
+							
+							onButtonRightClick = function(btn) {
+								
+							};
+						}
+						
+						myY += 64 + 32;
+					}
+					
+					statusText = "Fetched!";
+				})
+				.andCatch(function(e) {
+					statusText = "There was an error";	
+				})
+				.andFinally(function(e) {
+					stopScrolling = false;
+				});
+			};
+			
+			onDrawSummary = function() {
+				var s_ = "Assets:\n";
 				s_ += "Page " + string(1 + pageIndex) + "\n";
 				s_ += statusText + "\n";
 				
@@ -491,4 +615,93 @@ else if (room == rmBLLTestcasePS) {
 	
 	updateStuff();
 }
-
+else if (room == rmBLLTestcaseLeaderboard) {
+	lbIndex = 0;
+	lbAmount = 4;
+	lbItems = undefined;
+	lbBusy = false;
+	
+	updateStuff = function() {
+		if (lbBusy) {
+			exit;
+		}
+		
+		lbBusy = true;
+		bll
+		.leaderboardGetScoreList(leaderboardId, lbAmount, lbIndex * lbAmount)
+		.andThen(function(e) {
+			lbItems = e.resultAsJson.items;
+		})
+		.andCatch(function(e) {
+			show_message_async("Failed to obtain leaderboard items:\n" + e.result);	
+		})
+		.andFinally(function(e) {
+			show_debug_message(e);
+			lbBusy = false;
+		});
+	};
+	
+	onScroll = function() {
+		if (lbIndex < 0) {
+			lbIndex = 0;
+			exit;
+		}
+		
+		updateStuff();
+	};
+	
+	attachToButton("submit_score", function(btn) {
+		if (lbBusy) {
+			exit;
+		}
+		
+		askForString("score?", string(1 + irandom(100000)), function(score_) {
+			if (score_ == "") {
+				exit;
+			}
+			
+			var rscore_ = real(score_); // < cast to a number
+			tmpScore = rscore_;
+			askForString("metadata? cancel or empty string for none", "", function(metadata_) {
+				var rmetadata_ = (metadata_ == "")? undefined: metadata_;
+				tmpMetadata = rmetadata_;
+				askForString("member id? cancel or empty string for none", "", function(memberid_) {
+					var rmemberid_ = (memberid_ == "")? undefined: memberid_;
+					
+					bll
+					.leaderboardSubmitScore(leaderboardId, tmpScore, tmpMetadata, rmemberid_)
+					.andThen(function(e) {
+						show_message_async("Published the score successfully.");
+						updateStuff();
+					})
+					.andCatch(function(e) {
+						show_message_async("Failed to publish the leaderboard score:\n" + e.result);
+					})
+					.andFinally(function(e) {
+						show_debug_message(e);
+					});
+				});
+			});
+		});
+	});
+	
+	attachToButton("goto_back", function(btn) {
+		if (lbBusy) {
+			exit;
+		}
+		
+		room_goto(rmBLLTestcase);
+	});
+	
+	attachToButton("scroll_forward", function(btn) {
+		++lbIndex;
+		onScroll();
+	});
+	
+	attachToButton("scroll_back", function(btn) {
+		--lbIndex;
+		onScroll();
+	});
+	
+	updateStuff();
+}

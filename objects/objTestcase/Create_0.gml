@@ -140,9 +140,9 @@ attemptSilentSignin = function() {
 		})
 		.andCatch(function(e) {
 			// uh oh
-			file_delete("cache.dat");
+			//file_delete("cache.dat");
 			signedIn = false;
-			show_message_async("Sign in failed, please sign in again");
+			show_message_async("Silent sign in failed, please sign in again");
 		})
 		.andFinally(function(e) {
 			show_debug_message(json_stringify(e));

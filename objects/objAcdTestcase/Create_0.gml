@@ -7,6 +7,8 @@ acEntities = undefined;
 acStorage = undefined;
 acFiles = undefined;
 acId = undefined;
+acContexts = undefined;
+acContextsHintLine = "";
 
 amount_ = 0;
 
@@ -16,7 +18,44 @@ attachToButton = method(id, objTestcase.attachToButton);
 askForString = objTestcase.askForString;
 bll = objTestcase.bll;
 
+bll.contextsGetAll().andThen(function(e) {
+	acContexts = e.resultAsJson.contexts;
+	acContextsHintLine = "";
+	for (var i_ = 0, l_ = array_length(acContexts); i_ < l_; ++i_) {
+		var ctx_ = acContexts[@ i_];
+		
+		// allowed context ids for the string ui dialog:
+		acContextsHintLine += string(ctx_.id);
+		if (i_ < l_ - 1) {
+			acContextsHintLine += ",";
+		}
+	}
+}).andCatch(function(e) {
+	acContexts = undefined;
+	show_message_async("Failed to fetch context ids, you cannot publish an AC.\n" + e.result);
+});
+
 publishAc = function() {
+	if (is_undefined(acContexts)) {
+		exit;
+	}
+	
+	if (!is_undefined(acCtxid)) {
+		var found_ = false;
+		for (var i_ = 0, l_ = array_length(acContexts); i_ < l_; ++i_) {
+			var ctx_ = acContexts[@ i_];
+		
+			if (acCtxid == ctx_.id) {
+				found_ = true;
+				break;
+			}
+		}
+		if (!found_) {
+			show_message_async("Context id is invalid, valid ones are:\n" + acContextsHintLine);
+			exit;
+		}
+	}
+	
 	bll
 	.assetCandidateCreate(
 		acName,
@@ -128,7 +167,7 @@ makeSummaryText = function() {
 };
 
 attachToButton("acd_set_name", function(btn) {
-	askForString("name:", "cool name", function(s_) {
+	askForString("name:", acName, function(s_) {
 		if (s_ == "") {
 			exit;
 		}
@@ -138,8 +177,9 @@ attachToButton("acd_set_name", function(btn) {
 }, id);
 
 attachToButton("acd_set_context_id", function(btn) {
-	askForString("context id (a number):", "69420", function(s_) {
+	askForString("context id\nempty string or cancel for none\nvalid: " + acContextsHintLine, string(acCtxid ?? ""), function(s_) {
 		if (s_ == "") {
+			acCtxid = undefined;
 			exit;
 		}
 		
